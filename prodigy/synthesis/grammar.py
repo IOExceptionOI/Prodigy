@@ -98,7 +98,7 @@ NTList = List[NonTerminal]
 """
 
 from probably.pgcl.ast.instructions import InstrClass
-from .semantics import IfInstrSemantics, AssignInstrSemantics, ChoiceInstrSemantics
+from .semantics import IfInstrSemantics, AssignInstrSemantics, ChoiceInstrSemantics, InstructionSequanceSemantics
 class Instruction(NonTerminal):
     def __init__(self):
         super().__init__(InstrClass, 'Instruction')
@@ -265,7 +265,9 @@ class SynthesisGrammar(Grammar):
             #| var ":=" rvalue                             -> assign
             ConcreteRule([self.var, self.expression],AssignInstrSemantics()),
             #| block "[" expression "]" block              -> choice
-            ConcreteRule([self.instruction, self.expression, self.instruction],ChoiceInstrSemantics())
+            ConcreteRule([self.instruction, self.expression, self.instruction],ChoiceInstrSemantics()),
+            # instruction* -> instructions
+            ConcreteRule([self.instruction, self.instruction], InstructionSequanceSemantics())
             ]
         
         self.expression.rule_list = [
@@ -281,15 +283,15 @@ class SynthesisGrammar(Grammar):
             #ConcreteRule([self.param], RParamSemantics())
         ]
         
-                
+        from probably.pgcl.ast.types import NatType
         self.var.rule_list = [
-            ConcreteRule([],VarSemantics('Var0')),
-            ConcreteRule([],VarSemantics('Var1')),
+            ConcreteRule([],VarSemantics('Var0', NatType(bounds=None))),
+            ConcreteRule([],VarSemantics('Var1', NatType(bounds=None))),
         ]
         
         self.param.rule_list = [
-            ConcreteRule([],RParamSemantics('Param0')),
-            ConcreteRule([],RParamSemantics('Param1')),
+            ConcreteRule([],RParamSemantics('Param0', NatType(bounds=None))),
+            ConcreteRule([],RParamSemantics('Param1', NatType(bounds=None))),
         ]
         
         self.expression.rule_list.extend(self.var.rule_list)

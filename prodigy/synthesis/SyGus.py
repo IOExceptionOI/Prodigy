@@ -9,7 +9,9 @@ from prodigy.analysis.equivalence.equivalence_check import check_equivalence
 
 import logging
 from prodigy.util.logger import log_setup
-from prodigy.util.color import Style
+
+from probably.pgcl.parser import parse_pgcl
+from probably.pgcl.compiler import compile_pgcl
 logger = log_setup(str(__name__).rsplit(".", maxsplit=1)[-1], logging.DEBUG)
 
 def SyGus(grammar: Grammar) -> None:
@@ -19,7 +21,7 @@ def SyGus(grammar: Grammar) -> None:
     grammar.print()
     
     #TODO: implement the SyGus algorithm
-    MAX_SIZE = 11
+    MAX_SIZE = 8
     
     program_storage: ProgramStorage = [[[] for _ in range(MAX_SIZE)] for _ in range(len(grammar.symbolist))]
     #program_storage: ProgramStorage = [[] for _ in range(len(grammar.symbolist))]
@@ -46,6 +48,13 @@ def SyGus(grammar: Grammar) -> None:
                     print(f"candidate_program: {candidate_program}")
                     print("--------------------------------")
                     program_storage[non_terminal.id][size].append(candidate_program)
+                    pgcl_program = candidate_program.to_pgcl()
+                    print(f"pgcl_program: {pgcl_program}")
+                    #parsed_pgcl_program = parse_pgcl(pgcl_program)
+                    #print(parsed_pgcl_program)
+                    # if Instruction:
+                    if non_terminal.id == 0:
+                        pass
 
             
             
