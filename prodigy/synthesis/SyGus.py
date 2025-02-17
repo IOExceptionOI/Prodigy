@@ -12,6 +12,9 @@ from prodigy.util.logger import log_setup
 
 from probably.pgcl.parser import parse_pgcl
 from probably.pgcl.compiler import compile_pgcl
+from probably.pgcl.ast.instructions import Instr
+from probably.pgcl.ast.expressions import Expr
+from probably.pgcl.ast.declarations import Decl
 logger = log_setup(str(__name__).rsplit(".", maxsplit=1)[-1], logging.DEBUG)
 
 def SyGus(grammar: Grammar) -> None:
@@ -21,7 +24,7 @@ def SyGus(grammar: Grammar) -> None:
     grammar.print()
     
     #TODO: implement the SyGus algorithm
-    MAX_SIZE = 8
+    MAX_SIZE = 11
     
     program_storage: ProgramStorage = [[[] for _ in range(MAX_SIZE)] for _ in range(len(grammar.symbolist))]
     #program_storage: ProgramStorage = [[] for _ in range(len(grammar.symbolist))]
@@ -49,7 +52,19 @@ def SyGus(grammar: Grammar) -> None:
                     print("--------------------------------")
                     program_storage[non_terminal.id][size].append(candidate_program)
                     pgcl_program = candidate_program.to_pgcl()
-                    print(f"pgcl_program: {pgcl_program}")
+                    
+                    if (not isinstance(pgcl_program, Expr)) and (not isinstance(pgcl_program, Decl)):
+                        instrs = "\n".join(map(str, pgcl_program))
+                        print(f"pgcl_program: \n{instrs}\n")
+                       
+                    else:
+                        
+                        print(f"pgcl_program: {pgcl_program}")
+                    
+                    # if isinstance(candidate_program, Instr):
+                    #     pgcl_program = candidate_program.to_pgcl()
+                    #     print(f"pgcl_program: {pgcl_program}")
+                    
                     #parsed_pgcl_program = parse_pgcl(pgcl_program)
                     #print(parsed_pgcl_program)
                     # if Instruction:

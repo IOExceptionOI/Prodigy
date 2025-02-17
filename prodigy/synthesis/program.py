@@ -28,7 +28,7 @@ class Program:
         for sub_program in self.sub_list:
             sub_pgcl_list.append(sub_program.to_pgcl())
             
-        return self.semantics.to_pgcl(sub_pgcl_list)
+        return self.semantics.buildPGCLProgram(sub_pgcl_list)
     
     
     

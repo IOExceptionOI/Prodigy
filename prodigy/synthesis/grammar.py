@@ -114,7 +114,7 @@ class Var(NonTerminal):
    
     
 from probably.pgcl.ast.declarations import ParameterDecl
-from .semantics import RParamSemantics
+
 
 class Param(NonTerminal):
     def __init__(self):
@@ -141,12 +141,12 @@ class Param(NonTerminal):
           | "not" expression                -> neg
           | "(" expression ")"              -> parens
           | "[" expression "]"              -> iverson
-          | literal -> RParam(Param)
+          | literal -> Param(Param)
           | var -> (Var)
 """
 
 from probably.pgcl.ast.expressions import ExprClass
-from .semantics import OrExprSemantics, AndExprSemantics, AddExprSemantics, VarSemantics, RParamSemantics
+from .semantics import OrExprSemantics, AndExprSemantics, AddExprSemantics, VarSemantics, ParamSemantics
 class Expression(NonTerminal):
     def __init__(self):
         super().__init__(ExprClass, 'Expression')
@@ -282,17 +282,29 @@ class SynthesisGrammar(Grammar):
             #| Param
             #ConcreteRule([self.param], RParamSemantics())
         ]
-        
-        from probably.pgcl.ast.types import NatType
+        #from .semantics import VarSemantics
         self.var.rule_list = [
-            ConcreteRule([],VarSemantics('Var0', NatType(bounds=None))),
-            ConcreteRule([],VarSemantics('Var1', NatType(bounds=None))),
+            ConcreteRule([],VarSemantics('Var0')),
+            ConcreteRule([],VarSemantics('Var1')),
+        ]
+        #from .semantics import ParamSemantics
+        self.param.rule_list = [
+            ConcreteRule([],ParamSemantics('Param0')),
+            ConcreteRule([],ParamSemantics('Param1')),
         ]
         
-        self.param.rule_list = [
-            ConcreteRule([],RParamSemantics('Param0', NatType(bounds=None))),
-            ConcreteRule([],RParamSemantics('Param1', NatType(bounds=None))),
-        ]
+        # TODO: add the rule for the variable and parameter Declaration
+        # from probably.pgcl.ast.types import NatType
+        # from .semantics import VarDeclSemantics
+        # self.var.rule_list = [
+        #     ConcreteRule([],VarDeclSemantics('Var0', NatType(bounds=None))),
+        #     ConcreteRule([],VarDeclSemantics('Var1', NatType(bounds=None))),
+        # ]
+        # from .semantics import ParamDeclSemantics
+        # self.param.rule_list = [
+        #     ConcreteRule([],ParamDeclSemantics('Param0', NatType(bounds=None))),
+        #     ConcreteRule([],ParamDeclSemantics('Param1', NatType(bounds=None))),
+        # ]
         
         self.expression.rule_list.extend(self.var.rule_list)
         self.expression.rule_list.extend(self.param.rule_list)
