@@ -122,6 +122,50 @@ def main(ctx, program_file: IO, input_dist: str,
     print(f"CPU-time elapsed: {stop - start:04f} seconds")
 
 
+#TODO: using program synthesis to generate the invariant and check the equivalence
+@cli.command('check_equality_with_synthesis')
+@click.pass_context
+@click.argument('program_file', type=click.File('r'))
+#@click.argument('invariant_file', type=click.File('r'))
+def check_equality_with_synthesis(ctx, program_file: IO):
+    """
+    Checks whether a certain loop-free program is an invariant of a specified while loop.
+    :param program_file: the file containing the while-loop
+    :param invariant_file: the provided invariant
+    :return:
+    """
+    prog_src = program_file.read()
+    
+    prog = compiler.parse_pgcl(prog_src)
+    if isinstance(prog, CheckFail):
+        raise ValueError(f"Could not compile the Program. {prog}")
+
+    start = time.perf_counter()
+    from prodigy.synthesis.synthesize_pgcl_invariant import synthesize_pgcl_invariant
+    invariants = synthesize_pgcl_invariant(prog)
+    for inv in invariants:
+        equiv, result = check_equivalence(prog, inv, ctx.obj['CONFIG'], compute_semantics)
+        
+        if equiv is True:
+            stop = time.perf_counter()
+            break
+        
+        assert isinstance(result, list)
+        print(
+            f"Program{Style.OKGREEN} is equivalent{Style.RESET} to invariant",
+            end="")
+        if len(result) == 0:
+            print(".")
+        else:
+            print(
+                f" {Style.OKGREEN}under the following constraints:{Style.RESET} {result}."
+            )
+            
+    print(f"CPU-time elapsed: {stop - start:04f} seconds")
+    return equiv, result
+
+
+
 @cli.command('check_equality')
 @click.pass_context
 @click.argument('program_file', type=click.File('r'))
@@ -145,6 +189,8 @@ def check_equality(ctx, program_file: IO, invariant_file: IO):
         raise ValueError(f"Could not compile invariant. {inv}")
 
     start = time.perf_counter()
+    
+    
     equiv, result = check_equivalence(prog, inv, ctx.obj['CONFIG'], compute_semantics)
     stop = time.perf_counter()
     if equiv is True:

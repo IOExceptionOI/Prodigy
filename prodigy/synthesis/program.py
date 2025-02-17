@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, TypeAlias
 from .semantics import Semantics
 
 from probably.pgcl.ast import program as pgcl_program
@@ -32,5 +32,5 @@ class Program:
     
     
     
-ProgramList = List[Program]
-ProgramStorage = List[ProgramList]
+ProgramList: TypeAlias = List[Program]
+ProgramStorage: TypeAlias = List[ProgramList]

@@ -255,26 +255,27 @@ class SynthesisGrammar(Grammar):
         self.param = NonTerminalFactory.param()
 
         super().__init__(
-            _start=self.var,
+            _start=self.instruction,
             _symbolist=[self.instruction, self.expression, self.var, self.param]
         )
         
         self.instruction.rule_list =[
+            # instruction* -> instructions
+            ConcreteRule([self.instruction, self.instruction], InstructionSequanceSemantics()),
             #| "if" "(" expression ")" block "else"? block -> if
             ConcreteRule([self.expression, self.instruction, self.instruction],IfInstrSemantics()),
             #| var ":=" rvalue                             -> assign
             ConcreteRule([self.var, self.expression],AssignInstrSemantics()),
             #| block "[" expression "]" block              -> choice
             ConcreteRule([self.instruction, self.expression, self.instruction],ChoiceInstrSemantics()),
-            # instruction* -> instructions
-            ConcreteRule([self.instruction, self.instruction], InstructionSequanceSemantics())
+            
             ]
         
         self.expression.rule_list = [
             #| expression "||" expression  -> or
-            ConcreteRule([self.expression, self.expression],OrExprSemantics()),
+            #ConcreteRule([self.expression, self.expression],OrExprSemantics()),
             #| expression "&" expression       -> and
-            ConcreteRule([self.expression, self.expression],AndExprSemantics()),
+            #ConcreteRule([self.expression, self.expression],AndExprSemantics()),
             #| expression "+" expression -> add
             ConcreteRule([self.expression, self.expression],AddExprSemantics()),
             #| Var
@@ -285,12 +286,12 @@ class SynthesisGrammar(Grammar):
         #from .semantics import VarSemantics
         self.var.rule_list = [
             ConcreteRule([],VarSemantics('Var0')),
-            ConcreteRule([],VarSemantics('Var1')),
+            #ConcreteRule([],VarSemantics('Var1')),
         ]
         #from .semantics import ParamSemantics
         self.param.rule_list = [
             ConcreteRule([],ParamSemantics('Param0')),
-            ConcreteRule([],ParamSemantics('Param1')),
+            #ConcreteRule([],ParamSemantics('Param1')),
         ]
         
         # TODO: add the rule for the variable and parameter Declaration
@@ -306,5 +307,5 @@ class SynthesisGrammar(Grammar):
         #     ConcreteRule([],ParamDeclSemantics('Param1', NatType(bounds=None))),
         # ]
         
-        self.expression.rule_list.extend(self.var.rule_list)
-        self.expression.rule_list.extend(self.param.rule_list)
+        # self.expression.rule_list.extend(self.var.rule_list)
+        # self.expression.rule_list.extend(self.param.rule_list)

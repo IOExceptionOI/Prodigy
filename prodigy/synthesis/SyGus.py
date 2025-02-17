@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Generator, TypeAlias
 
 from prodigy.synthesis.grammar import SynthesisGrammar, Rule, Grammar
-from prodigy.synthesis.program import ProgramList, ProgramStorage
+from prodigy.synthesis.program import Program, ProgramList, ProgramStorage
 
 from prodigy.analysis.analyzer import compute_semantics
 from prodigy.analysis.config import ForwardAnalysisConfig
@@ -17,15 +17,16 @@ from probably.pgcl.ast.expressions import Expr
 from probably.pgcl.ast.declarations import Decl
 logger = log_setup(str(__name__).rsplit(".", maxsplit=1)[-1], logging.DEBUG)
 
-def SyGus(grammar: Grammar) -> None:
+
+def SyGus(grammar: Grammar) -> Generator[Program, None, None]:
     grammar.indexSymbol()
     for symbol in grammar.symbolist:
         print(f"NonTerminal: {symbol}, id: {symbol.id}")
     grammar.print()
     
     #TODO: implement the SyGus algorithm
-    MAX_SIZE = 11
-    
+    MAX_SIZE = 20
+   
     program_storage: ProgramStorage = [[[] for _ in range(MAX_SIZE)] for _ in range(len(grammar.symbolist))]
     #program_storage: ProgramStorage = [[] for _ in range(len(grammar.symbolist))]
     
@@ -52,14 +53,19 @@ def SyGus(grammar: Grammar) -> None:
                     print("--------------------------------")
                     program_storage[non_terminal.id][size].append(candidate_program)
                     pgcl_program = candidate_program.to_pgcl()
+                    print(f"pgcl_program: {pgcl_program}")
                     
-                    if (not isinstance(pgcl_program, Expr)) and (not isinstance(pgcl_program, Decl)):
-                        instrs = "\n".join(map(str, pgcl_program))
-                        print(f"pgcl_program: \n{instrs}\n")
+                    
+                    # if (not isinstance(pgcl_program, Expr)) and (not isinstance(pgcl_program, Decl)):
+                    #     instrs = "\n".join(map(str, pgcl_program))
+                    #     print(f"pgcl_program: \n{instrs}\n")
                        
-                    else:
-                        
-                        print(f"pgcl_program: {pgcl_program}")
+                    # else:
+                    #     print(f"pgcl_program: {pgcl_program}")
+                    
+                    # yield the candidate_program for check the equivalence
+                    if non_terminal.id == 0:
+                        yield pgcl_program
                     
                     # if isinstance(candidate_program, Instr):
                     #     pgcl_program = candidate_program.to_pgcl()

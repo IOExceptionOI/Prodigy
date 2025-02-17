@@ -143,3 +143,6 @@ poetry.lock
 *.txt
 *.md
 !README.md
+
+# invariant_pgcl_program.txt
+invariant_pgcl_program.txt
