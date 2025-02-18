@@ -1,10 +1,12 @@
 from __future__ import annotations
 from typing import List, Union
+from decimal import Decimal
+from fractions import Fraction
 from abc import ABC, abstractmethod
 from probably.pgcl.ast import Node, Var
-from probably.pgcl.ast.expressions import Expr, VarExpr
+from probably.pgcl.ast.expressions import Expr, VarExpr, NatLitExpr, RealLitExpr    
 from probably.pgcl.ast.instructions import Instr
-
+from probably.pgcl.ast.expressions import CUniformExpr, BernoulliExpr, GeometricExpr, PoissonExpr, BinomialExpr, LogDistExpr, IidSampleExpr
 
 class Semantics(ABC):
     def __init__(self, _semantic_name: str):
@@ -107,8 +109,52 @@ class AndExprSemantics(ExpressionSemantics):
         lhs: Expr = sub_pgcl_list[0]
         rhs: Expr = sub_pgcl_list[1]
         return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
+class EqExprSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('EqExpr')
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> BinopExpr:
+        operator: Binop = Binop.EQ
+        lhs: Expr = sub_pgcl_list[0]
+        rhs: Expr = sub_pgcl_list[1]
+        return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
     
-
+class LeqExprSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('LeqExpr')
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> BinopExpr:
+        operator: Binop = Binop.LEQ
+        lhs: Expr = sub_pgcl_list[0]
+        rhs: Expr = sub_pgcl_list[1]
+        return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
+    
+class LtExprSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('LtExpr')
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> BinopExpr:
+        operator: Binop = Binop.LT
+        lhs: Expr = sub_pgcl_list[0]
+        rhs: Expr = sub_pgcl_list[1]
+        return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
+    
+class GeqExprSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('GeqExpr')
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> BinopExpr:
+        operator: Binop = Binop.GEQ
+        lhs: Expr = sub_pgcl_list[0]
+        rhs: Expr = sub_pgcl_list[1]
+        return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
+    
+class GtExprSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('GtExpr')
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> BinopExpr:
+        operator: Binop = Binop.GT
+        lhs: Expr = sub_pgcl_list[0]
+        rhs: Expr = sub_pgcl_list[1]
+        return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
+    
+    
 class AddExprSemantics(ExpressionSemantics):
     def __init__(self):
         super().__init__("AddExpr")
@@ -117,7 +163,7 @@ class AddExprSemantics(ExpressionSemantics):
         lhs: Expr = sub_pgcl_list[0]
         rhs: Expr = sub_pgcl_list[1]
         return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
-    
+
 class SubExprSemantics(ExpressionSemantics):
     def __init__(self):
         super().__init__("SubExpr")
@@ -126,6 +172,68 @@ class SubExprSemantics(ExpressionSemantics):
         lhs: Expr = sub_pgcl_list[0]
         rhs: Expr = sub_pgcl_list[1]
         return BinopExpr(operator=operator, lhs=lhs, rhs=rhs)
+    
+# Distribution_Semantics:
+class UniformDistributionSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('UniformDistribution')
+   
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> CUniformExpr:
+        start: Expr = sub_pgcl_list[0]
+        end: Expr = sub_pgcl_list[1]
+        return CUniformExpr(start=start, end=end)
+    
+class BernoulliDistributionSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('BernoulliDistribution')
+    
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> BernoulliExpr:
+        param: Expr = sub_pgcl_list[0]
+        return BernoulliExpr(param=param)
+    
+class GeometricDistributionSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('GeometricDistribution')
+    
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> GeometricExpr:
+        param: Expr = sub_pgcl_list[0]
+        return GeometricExpr(param=param)
+    
+class PoissonDistributionSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('PoissonDistribution')
+    
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> PoissonExpr:
+        param: Expr = sub_pgcl_list[0]
+        return PoissonExpr(param=param)
+    
+class BinomialDistributionSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('BinomialDistribution')
+    
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> BinomialExpr:
+        n: Expr = sub_pgcl_list[0]
+        p: Expr = sub_pgcl_list[1]
+        return BinomialExpr(n=n, p=p)
+    
+class LogDistributionSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('LogDistribution')
+   
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> LogDistExpr:
+        param: Expr = sub_pgcl_list[0]
+        return LogDistExpr(param=param)
+    
+class IidSampleSemantics(ExpressionSemantics):
+    def __init__(self):
+        super().__init__('IidSample')
+    
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> IidSampleExpr:
+        sampling_dist: Expr = sub_pgcl_list[0]
+        variable: Var = sub_pgcl_list[1]
+        return IidSampleExpr(sampling_dist=sampling_dist, variable=variable)
+    
+        
 # Var_Semantics:
 class VarSemantics(ExpressionSemantics):
     def __init__(self, _para_name=None):
@@ -136,6 +244,16 @@ class VarSemantics(ExpressionSemantics):
             return self.semantic_name
         return self.para_name
     def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> Var:
+        return self.para_name
+class VarExprSemantics(ExpressionSemantics):
+    def __init__(self, _para_name=None):
+        super().__init__('VarExpr')
+        self.para_name: Var = _para_name
+    def __str__(self):
+        if self.para_name is None:
+            return self.semantic_name
+        return f"VarExpr('{self.para_name}')"
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> VarExpr:
         return VarExpr(var=self.para_name)
 # Param_Semantics:
 class ParamSemantics(ExpressionSemantics):
@@ -145,7 +263,7 @@ class ParamSemantics(ExpressionSemantics):
     def __str__(self):
         if self.para_name is None:
             return self.semantic_name
-        return self.para_name
+        return f"VarExpr('{self.para_name}')"
     def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> Var:
         return VarExpr(var=self.para_name)
 # VarDecl_Semantics:
@@ -176,4 +294,32 @@ class ParamDeclSemantics(ExpressionSemantics):
         return self.para_name
     
     def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> ParameterDecl:
+        if self.type is None or self.para_name is None:
+            raise ValueError("Type or parameter name is None")
         return ParameterDecl(self.para_name, self.type) 
+    
+class NatLitExprSemantics(ExpressionSemantics):
+    def __init__(self, _value: int):
+        super().__init__('NatLitExpr')
+        self.value: int = _value
+    def __str__(self):
+        if self.value is None:
+            return self.semantic_name
+        return str(self.value)
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> NatLitExpr:
+        if self.value is None:
+            raise ValueError("Value is None")
+        return NatLitExpr(value=self.value)
+    
+class RealLitExprSemantics(ExpressionSemantics):
+    def __init__(self, _value: Union[Decimal, Fraction]):
+        super().__init__('RealLitExpr')
+        self.value: Union[Decimal, Fraction] = _value
+    def __str__(self):
+        if self.value is None:
+            return self.semantic_name
+        return str(self.value)
+    def buildPGCLProgram(self, sub_pgcl_list: List[List[Node]]) -> RealLitExpr:
+        if self.value is None:
+            raise ValueError("Value is None")
+        return RealLitExpr(value=self.value)

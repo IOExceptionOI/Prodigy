@@ -2,16 +2,8 @@ from typing import List, Generator, TypeAlias
 
 from prodigy.synthesis.grammar import SynthesisGrammar, Rule, Grammar
 from prodigy.synthesis.program import Program, ProgramList, ProgramStorage
-
-from prodigy.analysis.analyzer import compute_semantics
-from prodigy.analysis.config import ForwardAnalysisConfig
-from prodigy.analysis.equivalence.equivalence_check import check_equivalence
-
 import logging
 from prodigy.util.logger import log_setup
-
-from probably.pgcl.parser import parse_pgcl
-from probably.pgcl.compiler import compile_pgcl
 from probably.pgcl.ast.instructions import Instr
 from probably.pgcl.ast.expressions import Expr
 from probably.pgcl.ast.declarations import Decl
@@ -25,7 +17,7 @@ def SyGus(grammar: Grammar) -> Generator[Program, None, None]:
     grammar.print()
     
     #TODO: implement the SyGus algorithm
-    MAX_SIZE = 20
+    MAX_SIZE = 11
    
     program_storage: ProgramStorage = [[[] for _ in range(MAX_SIZE)] for _ in range(len(grammar.symbolist))]
     #program_storage: ProgramStorage = [[] for _ in range(len(grammar.symbolist))]
@@ -65,6 +57,7 @@ def SyGus(grammar: Grammar) -> Generator[Program, None, None]:
                     
                     # yield the candidate_program for check the equivalence
                     if non_terminal.id == 0:
+                        #pass
                         yield pgcl_program
                     
                     # if isinstance(candidate_program, Instr):
@@ -74,8 +67,7 @@ def SyGus(grammar: Grammar) -> Generator[Program, None, None]:
                     #parsed_pgcl_program = parse_pgcl(pgcl_program)
                     #print(parsed_pgcl_program)
                     # if Instruction:
-                    if non_terminal.id == 0:
-                        pass
+                    
 
             
             

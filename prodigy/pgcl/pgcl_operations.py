@@ -46,6 +46,8 @@ def cav_phi(program: Program, invariant: Program) -> Program:
 
         .. returns: A new program object equivalent to one loop unrolling of :param: program.
     """
+    print(f'program:\n{program}\n')
+    print(f'invariant:\n{invariant}\n')
     assert isinstance(
         program.instructions[0],
         WhileInstr), "Program can only be one big loop to analyze."
@@ -64,4 +66,4 @@ def cav_phi(program: Program, invariant: Program) -> Program:
                    constants=invariant.constants,
                    parameters=invariant.parameters,
                    instructions=[guarded_instr],
-                   functions=invariant.functions)
+                   )

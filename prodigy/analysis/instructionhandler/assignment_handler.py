@@ -43,6 +43,8 @@ class AssignmentHandler(InstructionHandler):
                 f"Assignment {instruction} is ill-formed. right-hand-side must be an expression."
             )
         logger.info("Update %s", instruction)
+        print(f'lhs: {instruction.lhs}, type: {type(instruction.lhs)}')
+        print(f'rhs: {instruction.rhs}, type: {type(instruction.rhs)}')
         return distribution.update(
             BinopExpr(operator=Binop.EQ,
                       lhs=VarExpr(instruction.lhs),
